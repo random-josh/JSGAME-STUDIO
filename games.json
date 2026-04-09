@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "Racing X",
+    "desc": "Fast arcade racing game",
+    "category": "racing"
+  },
+  {
+    "id": 2,
+    "name": "Battle Arena",
+    "desc": "Survival combat game",
+    "category": "action"
+  }
+]

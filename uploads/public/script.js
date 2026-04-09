@@ -1,0 +1,147 @@
+let games = [];
+let currentUser = null;
+
+/* =========================
+   LOAD GAMES FROM SERVER
+========================= */
+async function loadGames() {
+  const res = await fetch("/api/games");
+  games = await res.json();
+  renderGames(games);
+}
+
+/* =========================
+   RENDER GAMES
+========================= */
+function renderGames(list) {
+  const container = document.getElementById("games");
+  container.innerHTML = "";
+
+  list.forEach(game => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <h3>${game.name}</h3>
+      <p>${game.desc}</p>
+
+      ${game.image ? `<img src="${game.image}" width="100%">` : ""}
+
+      <button onclick="openModal(${game.id})">View</button>
+      <button onclick="deleteGame(${game.id})">Delete</button>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+/* =========================
+   SEARCH (LOCAL FILTER)
+========================= */
+document.getElementById("search").addEventListener("input", (e) => {
+  const value = e.target.value.toLowerCase();
+
+  const filtered = games.filter(g =>
+    g.name.toLowerCase().includes(value)
+  );
+
+  renderGames(filtered);
+});
+
+/* =========================
+   LOGIN SYSTEM
+========================= */
+async function login() {
+  const username = prompt("Username:");
+  const password = prompt("Password:");
+
+  const res = await fetch("/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    alert("Login failed");
+  } else {
+    currentUser = data.user;
+    alert("Welcome " + currentUser.username);
+  }
+}
+
+/* =========================
+   ADD GAME (ADMIN ONLY)
+========================= */
+async function addGame() {
+  const name = document.getElementById("name").value;
+  const desc = document.getElementById("desc").value;
+  const image = document.getElementById("image").files[0];
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("desc", desc);
+  if (image) formData.append("image", image);
+
+  const res = await fetch("/api/games", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    alert("You are not allowed (need admin login)");
+  } else {
+    loadGames();
+  }
+}
+
+/* =========================
+   DELETE GAME
+========================= */
+async function deleteGame(id) {
+  const res = await fetch(`/api/games/${id}`, {
+    method: "DELETE"
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    alert("Not allowed");
+  } else {
+    loadGames();
+  }
+}
+
+/* =========================
+   MODAL SYSTEM
+========================= */
+function openModal(id) {
+  const game = games.find(g => g.id === id);
+
+  document.getElementById("modalTitle").innerText = game.name;
+  document.getElementById("modalDesc").innerText = game.desc;
+
+  document.getElementById("modal").classList.remove("hidden");
+}
+
+function closeModal() {
+  document.getElementById("modal").classList.add("hidden");
+}
+
+/* =========================
+   THEME TOGGLE
+========================= */
+document.getElementById("themeToggle").addEventListener("click", () => {
+  document.body.classList.toggle("light");
+
+  localStorage.setItem(
+    "theme",
+    document.body.classList.contains("light") ? "light" : "dark"
+  );
+});
+
+/* LOAD ON START */
+loadGames();
