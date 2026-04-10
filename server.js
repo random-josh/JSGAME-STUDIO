@@ -37,23 +37,21 @@ app.get("/api/games", (req, res) => {
 
 // POST game
 app.post("/api/games", upload.single("file"), (req, res) => {
-  try {
-    const { name, desc } = req.body;
+  console.log("BODY:", req.body);
+  console.log("FILE:", req.file);
 
-    const newGame = {
-      id: Date.now(),
-      name,
-      desc,
-      file: req.file ? "/uploads/" + req.file.filename : null
-    };
+  const newGame = {
+    id: Date.now(),
+    name: req.body.name,
+    desc: req.body.desc,
+    file: req.file ? "/uploads/" + req.file.filename : null
+  };
 
-    games.push(newGame);
+  games.push(newGame);
 
-    res.json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server crashed" });
-  }
+  console.log("GAMES:", games);
+
+  res.json({ success: true });
 });
 
 // homepage
