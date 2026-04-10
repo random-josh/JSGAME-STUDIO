@@ -36,7 +36,12 @@ function renderGames(list) {
       <h3>${game.name}</h3>
       <p>${game.desc}</p>
 
-      ${game.image ? `<img src="${game.image}" width="100%">` : ""}
+      ${game.image ? `
+  <img src="${game.image}" width="100%">
+  <a href="${game.image}" download>
+    <button>Download</button>
+  </a>
+` : ""}
 
       <button onclick="openModal(${game.id})">View</button>
       <button onclick="deleteGame(${game.id})">Delete</button>
@@ -81,26 +86,28 @@ async function login() {
     alert("Welcome " + currentUser.username);
   }
 }
-
 /* =========================
-   ADD GAME (INFINTI ONLY)
+   add game (infiniti)
 ========================= */
 async function addGame() {
   const name = document.getElementById("name").value;
   const desc = document.getElementById("desc").value;
   const image = document.getElementById("image").files[0];
 
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("desc", desc);
+  if (image) formData.append("image", image);
+
   const res = await fetch("/api/games", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ name, desc })
-});
+    method: "POST",
+    body: formData
+  });
+
   const data = await res.json();
 
   if (data.error) {
-    alert("You are not allowed (need admin login)");
+    alert("Upload failed");
   } else {
     loadGames();
   }

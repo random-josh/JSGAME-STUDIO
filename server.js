@@ -1,3 +1,5 @@
+const multer = require("multer");
+const path = require("path");
 const express = require("express");
 const path = require("path");
 
@@ -15,14 +17,14 @@ app.get("/api/games", (req, res) => {
   res.json(games);
 });
 
-app.post("/api/games", (req, res) => {
+app.post("/api/games", upload.single("image"), (req, res) => {
   const { name, desc } = req.body;
 
   const newGame = {
     id: Date.now(),
     name,
     desc,
-    image: ""
+    image: req.file ? "/uploads/" + req.file.filename : null
   };
 
   games.push(newGame);
@@ -39,4 +41,14 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
+  const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  }
 });
+
+const upload = multer({ storage });
+app.use("/uploads", express.static("uploads"));
