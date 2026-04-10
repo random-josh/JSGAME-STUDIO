@@ -1,14 +1,21 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
+
 // middleware
 app.use(express.json());
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
 
-// CREATE uploads folder handler
+// make uploads folder if missing
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
+
+// multer setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -20,17 +27,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// make uploads downloadable
-app.use("/uploads", express.static("uploads"));
-
+// memory storage
 let games = [];
 
-/* GET games */
+// GET games
 app.get("/api/games", (req, res) => {
   res.json(games);
 });
 
-/* POST game WITH FILE */
+// POST game
 app.post("/api/games", upload.single("file"), (req, res) => {
   try {
     const { name, desc } = req.body;
@@ -50,7 +55,6 @@ app.post("/api/games", upload.single("file"), (req, res) => {
     res.status(500).json({ error: "Server crashed" });
   }
 });
-
 
 // homepage
 app.get("/", (req, res) => {
