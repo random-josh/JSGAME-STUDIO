@@ -1,30 +1,19 @@
-app.use(express.json());
 const express = require("express");
 const path = require("path");
 
 const app = express();
 
-// IMPORTANT: serve frontend files
+// middleware
+app.use(express.json());
 app.use(express.static("public"));
 
-// parse JSON
-app.use(express.json());
+// storage
+let games = [];
 
-// HOME PAGE ROUTE
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// example API (keep yours too)
+// routes
 app.get("/api/games", (req, res) => {
-  res.json([]);
+  res.json(games);
 });
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-  let games = []; // make sure this exists at top
 
 app.post("/api/games", (req, res) => {
   const { name, desc } = req.body;
@@ -33,11 +22,21 @@ app.post("/api/games", (req, res) => {
     id: Date.now(),
     name,
     desc,
-    image: "" // ignore image for now
+    image: ""
   };
 
   games.push(newGame);
 
   res.json({ success: true });
 });
+
+// homepage
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// server start
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
