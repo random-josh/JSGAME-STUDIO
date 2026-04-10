@@ -90,16 +90,13 @@ async function addGame() {
   const desc = document.getElementById("desc").value;
   const image = document.getElementById("image").files[0];
 
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("desc", desc);
-  if (image) formData.append("image", image);
-
   const res = await fetch("/api/games", {
-    method: "POST",
-    body: formData
-  });
-
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ name, desc })
+});
   const data = await res.json();
 
   if (data.error) {
