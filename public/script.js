@@ -85,7 +85,7 @@ async function login() {
   }
 }
 /* =========================
-   add game (infiniti)
+   add game ()
 ========================= */
 async function addGame() {
   console.log("BUTTON CLICKED");
