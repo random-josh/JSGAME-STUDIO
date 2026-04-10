@@ -1,3 +1,4 @@
+app.use(express.json());
 const express = require("express");
 const path = require("path");
 
@@ -23,4 +24,20 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
+  let games = []; // make sure this exists at top
+
+app.post("/api/games", (req, res) => {
+  const { name, desc } = req.body;
+
+  const newGame = {
+    id: Date.now(),
+    name,
+    desc,
+    image: "" // ignore image for now
+  };
+
+  games.push(newGame);
+
+  res.json({ success: true });
+});
 });
