@@ -4,34 +4,32 @@ const path = require("path");
 
 const app = express();
 
-// middleware
 app.use(express.json());
 app.use(express.static("public"));
 
-// storage setup (MUST BE BEFORE ROUTES)
+// CREATE uploads folder handler
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
   }
 });
 
 const upload = multer({ storage });
 
-// serve uploaded files
+// make uploads downloadable
 app.use("/uploads", express.static("uploads"));
 
-// in-memory DB
 let games = [];
 
-// GET games
+/* GET games */
 app.get("/api/games", (req, res) => {
   res.json(games);
 });
 
-// POST game (WITH FILE UPLOAD)
+/* POST game WITH FILE */
 app.post("/api/games", upload.single("image"), (req, res) => {
   const { name, desc } = req.body;
 
@@ -39,12 +37,17 @@ app.post("/api/games", upload.single("image"), (req, res) => {
     id: Date.now(),
     name,
     desc,
-    image: req.file ? "/uploads/" + req.file.filename : null
+    file: req.file ? "/uploads/" + req.file.filename : null
   };
 
   games.push(newGame);
 
   res.json({ success: true });
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
 
 // homepage

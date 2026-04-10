@@ -42,6 +42,11 @@ function renderGames(list) {
     <button>Download</button>
   </a>
 ` : ""}
+      ${game.file ? `
+  <a href="${game.file}" download>
+    <button>Download Game</button>
+  </a>
+` : ""}
 
       <button onclick="openModal(${game.id})">View</button>
       <button onclick="deleteGame(${game.id})">Delete</button>
@@ -97,7 +102,7 @@ async function addGame() {
   const formData = new FormData();
   formData.append("name", name);
   formData.append("desc", desc);
-  if (image) formData.append("image", image);
+  formData.append("image", image);
 
   const res = await fetch("/api/games", {
     method: "POST",
@@ -106,10 +111,10 @@ async function addGame() {
 
   const data = await res.json();
 
-  if (data.error) {
-    alert("Upload failed");
-  } else {
+  if (data.success) {
     loadGames();
+  } else {
+    alert("Upload failed");
   }
 }
 
