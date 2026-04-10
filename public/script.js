@@ -35,18 +35,11 @@ function renderGames(list) {
     card.innerHTML = `
       <h3>${game.name}</h3>
       <p>${game.desc}</p>
-
-      ${game.image ? `
-  <img src="${game.image}" width="100%">
-  <a href="${game.image}" download>
-    <button>Download</button>
-  </a>
-` : ""}
       ${game.file ? `
-  <a href="${game.file}" download>
-    <button>Download Game</button>
-  </a>
-` : ""}
+      <a href="${game.file}" download>
+        <button>Download Game</button>
+      </a>
+    ` : ""}
 
       <button onclick="openModal(${game.id})">View</button>
       <button onclick="deleteGame(${game.id})">Delete</button>
@@ -95,26 +88,35 @@ async function login() {
    add game (infiniti)
 ========================= */
 async function addGame() {
-  const name = document.getElementById("name").value;
-  const desc = document.getElementById("desc").value;
-  const image = document.getElementById("image").files[0];
+  try {
+    const name = document.getElementById("name").value;
+    const desc = document.getElementById("desc").value;
+    const image = document.getElementById("image").files[0];
 
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("desc", desc);
-  formData.append("image", image);
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("desc", desc);
+    formData.append("image", image);
 
-  const res = await fetch("/api/games", {
-    method: "POST",
-    body: formData
-  });
+    const res = await fetch("/api/games", {
+      method: "POST",
+      body: formData
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.success) {
-    loadGames();
-  } else {
-    alert("Upload failed");
+    if (data.success) {
+      document.getElementById("name").value = "";
+      document.getElementById("desc").value = "";
+      document.getElementById("image").value = "";
+
+      await loadGames();
+    } else {
+      alert("Upload failed");
+    }
+
+  } catch (err) {
+    console.error("ERROR:", err);
   }
 }
 

@@ -3,9 +3,10 @@ const multer = require("multer");
 const path = require("path");
 
 const app = express();
-
+// middleware
 app.use(express.json());
 app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
 
 // CREATE uploads folder handler
 const storage = multer.diskStorage({
@@ -30,19 +31,24 @@ app.get("/api/games", (req, res) => {
 });
 
 /* POST game WITH FILE */
-app.post("/api/games", upload.single("image"), (req, res) => {
-  const { name, desc } = req.body;
+app.post("/api/games", upload.single("file"), (req, res) => {
+  try {
+    const { name, desc } = req.body;
 
-  const newGame = {
-    id: Date.now(),
-    name,
-    desc,
-    file: req.file ? "/uploads/" + req.file.filename : null
-  };
+    const newGame = {
+      id: Date.now(),
+      name,
+      desc,
+      file: req.file ? "/uploads/" + req.file.filename : null
+    };
 
-  games.push(newGame);
+    games.push(newGame);
 
-  res.json({ success: true });
+    res.json({ success: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server crashed" });
+  }
 });
 
 
