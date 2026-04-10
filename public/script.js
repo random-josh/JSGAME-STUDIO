@@ -88,6 +88,8 @@ async function login() {
    add game (infiniti)
 ========================= */
 async function addGame() {
+  console.log("BUTTON CLICKED");
+
   try {
     const name = document.getElementById("name").value;
     const desc = document.getElementById("desc").value;
@@ -103,23 +105,21 @@ async function addGame() {
       body: formData
     });
 
-    const data = await res.json();
+    console.log("STATUS:", res.status);
+
+    const text = await res.text();
+    console.log("RESPONSE:", text);
+
+    const data = JSON.parse(text);
 
     if (data.success) {
-      document.getElementById("name").value = "";
-      document.getElementById("desc").value = "";
-      document.getElementById("image").value = "";
-
       await loadGames();
-    } else {
-      alert("Upload failed");
     }
 
   } catch (err) {
     console.error("ERROR:", err);
   }
 }
-
 /* =========================
    DELETE GAME
 ========================= */
