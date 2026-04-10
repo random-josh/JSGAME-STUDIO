@@ -98,7 +98,7 @@ async function addGame() {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("desc", desc);
-    formData.append("image", image);
+    formData.append("file", image);
 
     const res = await fetch("/api/games", {
       method: "POST",
