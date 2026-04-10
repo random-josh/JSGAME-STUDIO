@@ -5,9 +5,20 @@ let currentUser = null;
    LOAD GAMES FROM SERVER
 ========================= */
 async function loadGames() {
-  const res = await fetch("/api/games");
-  games = await res.json();
-  renderGames(games);
+  try {
+    const res = await fetch("/api/games");
+
+    console.log("STATUS:", res.status);
+
+    const data = await res.json();
+    console.log("DATA:", data);
+
+    games = data;
+    renderGames(games);
+
+  } catch (err) {
+    console.error("ERROR:", err);
+  }
 }
 
 /* =========================
@@ -72,7 +83,7 @@ async function login() {
 }
 
 /* =========================
-   ADD GAME (ADMIN ONLY)
+   ADD GAME (INFINTI ONLY)
 ========================= */
 async function addGame() {
   const name = document.getElementById("name").value;
