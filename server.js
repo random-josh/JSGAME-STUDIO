@@ -1,6 +1,6 @@
+const express = require("express");
 const multer = require("multer");
 const path = require("path");
-const express = require("express");
 
 const app = express();
 
@@ -8,14 +8,30 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-// storage
+// storage setup (MUST BE BEFORE ROUTES)
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  }
+});
+
+const upload = multer({ storage });
+
+// serve uploaded files
+app.use("/uploads", express.static("uploads"));
+
+// in-memory DB
 let games = [];
 
-// routes
+// GET games
 app.get("/api/games", (req, res) => {
   res.json(games);
 });
 
+// POST game (WITH FILE UPLOAD)
 app.post("/api/games", upload.single("image"), (req, res) => {
   const { name, desc } = req.body;
 
@@ -36,18 +52,8 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// server start
+// start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
-  const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
 });
-
-const upload = multer({ storage });
-app.use("/uploads", express.static("uploads"));
